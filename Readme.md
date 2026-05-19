@@ -143,11 +143,5 @@ pdflatex main.tex
 pdflatex main.tex
 ```
 
-
-<div align="center">
-  <a href="./docs/architecture.md"><img src="./img/btn-architecture.svg" width="400" alt="Архитектура"></a>
-  <a href="./docs/api.md"><img src="./img/btn-api.svg" width="400" alt="API"></a>
-</div>
-
 ---
 **by finnik & s1gmagor**
