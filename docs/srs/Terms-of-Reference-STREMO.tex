@@ -1,0 +1,107 @@
+\documentclass[12pt,a4paper]{article}
+
+\usepackage{fontspec}
+\setmainfont{CMU Serif}
+\setsansfont{CMU Sans Serif}
+\setmonofont{CMU Typewriter Text}
+\usepackage[russian]{babel}
+
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{amsfonts}
+
+\usepackage{graphicx}
+\usepackage{geometry}
+\geometry{top=3cm, bottom=2.5cm, left=3cm, right=2cm, headheight=1.5cm, headsep=0.8cm}
+
+\usepackage{fancyhdr}
+\pagestyle{fancy}
+\fancyhf{}
+
+\fancyhead[L]{\includegraphics[height=1.2cm]{../img/logo.png}}
+\fancyhead[R]{\small\scshape STREMO: Математические модели}
+\fancyfoot[C]{\thepage}
+\renewcommand{\headrulewidth}{0.4pt}
+\renewcommand{\footrulewidth}{0pt}
+
+\usepackage{titlesec}
+\titleformat{\section}{\Large\bfseries}{\thesection.}{0.5em}{}
+\titleformat{\subsection}{\large\bfseries}{\thesubsection.}{0.5em}{}
+
+\begin{document}
+
+\thispagestyle{fancy}
+
+\begin{center}
+    \vspace{0.4cm}
+    \Large{\textbf{Спецификация математических моделей и алгоритмов обработки}}\\
+        \vspace{0.5cm}
+    \rule{\textwidth}{0.4pt}
+\end{center}
+
+\vspace{1cm}
+
+\section{1. Оптимизация размера медиа-чанка (Streaming Pipeline)}
+
+Для балансировки задержки `Latency` и пропускной способности `Bandwidth` при передаче живого видеопотока по протоколу gRPC необходимо аналитически определить оптимальный размер медиа-чанка $S_{chunk}$ в битах.
+
+Введем обозначения:
+\begin{itemize}
+    \item $B_{network}$ --- доступная пропускная способность канала связи (бит/с).
+    \item $R_{bitrate}$ --- битрейт видеопотока (бит/с), при условии $B_{network} > R_{bitrate}$.
+    \item $T_{overhead}$ --- константная задержка на сериализацию Protobuf и отправку сетевого кадра (с).
+\end{itemize}
+
+Длительность контента, содержащегося в одном чанке, вычисляется как $$D_{chunk} = \frac{S_{chunk}}{R_{bitrate}}$$.\\
+Время физической передачи данного чанка по сети составляет $$T_{tx} = \frac{S_{chunk}}{B_{network}} + T_{overhead}$$.
+
+Фундаментальное условие непрерывности трансляции (исключение опустошения буфера) требует, чтобы время передачи чанка не превышало его медийную длительность:
+\begin{equation}
+T_{tx} \le D_{chunk} \implies \frac{S_{chunk}}{B_{network}} + T_{overhead} \le \frac{S_{chunk}}{R_{bitrate}}
+\end{equation}
+
+Решая данное неравенство относительно искомого размера чанка $S_{chunk}$, получаем:
+\begin{equation}
+S_{chunk} \left( \frac{1}{R_{bitrate}} - \frac{1}{B_{network}} \right) \ge T_{overhead}
+\end{equation}
+\begin{equation}
+S_{chunk} \ge \frac{T_{overhead} \cdot R_{bitrate} \cdot B_{network}}{B_{network} - R_{bitrate}}
+\end{equation}
+
+Поскольку end-to-end задержка прямо пропорциональна размеру чанка ($L \approx D_{chunk} + T_{tx}$), для ее минимизации размер чанка фиксируется на строгой нижней границе:
+\begin{equation}
+S_{opt} = \frac{T_{overhead} \cdot R_{bitrate} \cdot B_{network}}{B_{network} - R_{bitrate}}
+\end{equation}
+
+\section{2. Динамическая модель буферизации (ABR)}
+
+Размер видеобуфера $Q(t)$ на стороне клиента в момент времени $t$ описывается обыкновенным дифференциальным уравнением:
+\begin{equation}
+\frac{dQ(t)}{dt} = \frac{C(t)}{R_v(t)} - 1
+\end{equation}
+где $C(t)$ --- текущая пропускная способность сети, а $R_v(t)$ --- битрейт выбранного слоя качества. Целевая функция алгоритма адаптивного битрейта (ABR) сводится к максимизации качества при жестком ограничении вероятности опустошения буфера:
+\begin{equation}
+\max_{R_v} \sum_{k=1}^{K} U(R_v(k)) - \lambda \sum_{k=1}^{K-1} |R_v(k+1) - R_v(k)|
+\end{equation}
+при условии $Q(t) > 0$, где $U$ --- функция полезности, а $\lambda$ --- весовой коэффициент штрафа за переключение качества.
+
+\section{3. Матричные преобразования цветового пространства}
+
+В процессе транскодирования видеопотока (переход YUV $\leftrightarrow$ RGB) применяется линейное преобразование цветовых метрик. В рамках математического аппарата системы STREMO вектор состояния пикселя $\mathbf{v}$ строго определяется как \textbf{вектор-столбец}:
+\begin{equation}
+\mathbf{v} = \begin{pmatrix} v_1 \\ v_2 \\ v_3 \end{pmatrix}
+\end{equation}
+
+Прямое преобразование из исходного цветового пространства задается операцией левостороннего умножения на матрицу преобразования $A$:
+\begin{equation}
+\mathbf{c} = A \mathbf{v}
+\end{equation}
+
+Для обратного вычисления исходных компонент применяется левостороннее умножение вектора-столбца $\mathbf{c}$ на обратную матрицу $A^{-1}$:
+\begin{equation}
+\mathbf{v} = A^{-1} \mathbf{c}
+\end{equation}
+
+Обратите внимание: операция транспонирования обратной матрицы в данном случае \textbf{не применяется}. Транспонирование необходимо исключительно при использовании конвенции векторов-строк (где $\mathbf{v}^T = \mathbf{c}^T (A^{-1})^T$). Так как система оперирует исключительно векторами-столбцами, форма $\mathbf{v} = A^{-1} \mathbf{c}$ сохраняет полную математическую корректность.
+
+\end{document}
