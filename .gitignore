@@ -1,5 +1,149 @@
+# ==============================================================================
+# 1. Секреты и Конфигурации
+# ==============================================================================
+# Игнорируем все .env файлы, кроме шаблонов
 .env
-*.log
+.env.*
+!.env.example
+!.env.template
 
-.idea
-.vscode
+# Ключи, сертификаты и креды
+*.pem
+*.key
+*.cert
+*.crt
+secrets/
+credentials.json
+auth.json
+*.keystore
+*.p12
+
+# ==============================================================================
+# 2. Локальные настройки IDE и Редакторов
+# ==============================================================================
+# JetBrains (CLion, WebStorm, GoLand, IntelliJ)
+.idea/
+*.iws
+*.iml
+*.ipr
+out/
+
+# VS Code
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+*.code-workspace
+
+# Vim / Emacs
+*~
+*.swp
+*.swo
+.netrwhist
+
+# ==============================================================================
+# 3. Операционные системы
+# ==============================================================================
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+Icon
+._*
+.Spotlight-V100
+.Trashes
+
+# Windows
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+
+# Linux
+*~
+.directory
+
+# ==============================================================================
+# 4. Инфраструктура и DevOps (Terraform, Docker, K8s)
+# ==============================================================================
+# Terraform
+.terraform/
+*.tfstate
+*.tfstate.backup
+*.tfvars
+*.tfvars.json
+crash.log
+override.tf
+override.tf.json
+
+# Docker & Kubernetes
+docker-compose.override.yml
+kubeconfig
+*.kubeconfig
+helm/charts/
+
+# ==============================================================================
+# 5. C / C++ (Бэкенд ядро STREMO)
+# ==============================================================================
+# Скомпилированные объекты и бинарники
+*.o
+*.obj
+*.out
+*.app
+*.exe
+*.dll
+*.so
+*.dylib
+*.a
+*.lib
+
+# CMake и сборка
+CMakeCache.txt
+CMakeFiles/
+CMakeScripts/
+Makefile
+cmake_install.cmake
+install_manifest.txt
+compile_commands.json
+build/
+bin/
+/cmake-build-*/
+
+# ==============================================================================
+# 6. Frontend / Node.js (Next.js Клиент)
+# ==============================================================================
+node_modules/
+npm-debug.log
+yarn-error.log
+yarn-debug.log
+pnpm-debug.log
+
+.next/
+out/
+build/
+dist/
+
+*.log
+*.sqlite
+*.db
+*.sql.gz
+/data/
+/postgres-data/
+/kafka-data/
+/redis-data/
+
+# ==============================================================================
+# 8. Математика и Документация (LaTeX / SRS)
+# ==============================================================================
+*.aux
+*.toc
+*.log
+*.out
+*.fls
+*.fdb_latexmk
+*.synctex.gz
+*.bbl
+*.blg
+*.lof
+*.lot
