@@ -1,0 +1,53 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: redpanda
+  namespace: data-layer
+spec:
+  serviceName: redpanda
+  replicas: 1
+  selector:
+    matchLabels:
+      app: redpanda
+  template:
+    metadata:
+      labels:
+        app: redpanda
+    spec:
+      containers:
+        - name: redpanda
+          image: docker.redpanda.com/redpandadata/redpanda:v23.2.1
+          command:
+            - /bin/sh
+            - -c
+            - |
+              /usr/bin/rpk redpanda start \
+              --mode dev-container \
+              --smp 1 \
+              --memory 512M \
+              --kafka-addr internal://0.0.0.0:9092,external://0.0.0.0:19092 \
+              --advertise-kafka-addr internal://redpanda.data-layer.svc.cluster.local:9092,external://localhost:19092
+          ports:
+            - containerPort: 9092
+            - containerPort: 19092
+          resources:
+            requests:
+              memory: "256Mi"
+              cpu: "200m"
+            limits:
+              memory: "768Mi"
+              cpu: "1000m"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: redpanda
+  namespace: data-layer
+spec:
+  ports:
+    - name: kafka-internal
+      port: 9092
+    - name: kafka-external
+      port: 19092
+  selector:
+    app: redpanda
