@@ -113,7 +113,7 @@ cd STREMO
     <tr>
       <td align="center" width="50%">
         <br>
-        <a href="./docs/src/Terms_of_Reference_STREMO.pdf">
+        <a href="./docs/srs/Terms_of_Reference_STREMO.pdf">
           <img src="https://img.shields.io/badge/Отчет_в_формате_PDF-E34F26?style=for-the-badge&logo=pdf&logoColor=white" alt="PDF">
         </a>
         <br><br>
@@ -121,7 +121,7 @@ cd STREMO
       </td>
       <td align="center" width="50%">
         <br>
-        <a href="./docs/src/Terms_of_Reference_STREMO.tex">
+        <a href="./docs/srs/Terms_of_Reference_STREMO.tex">
           <img src="https://img.shields.io/badge/Исходный_код_LaTeX-008080?style=for-the-badge&logo=latex&logoColor=white" alt="LaTeX">
         </a>
         <br><br>
