@@ -1,0 +1,55 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: ingest-config
+  namespace: apps
+data:
+  RTMP_PORT: "1935"
+  REDIS_HOST: "redis.data-layer.svc.cluster.local"
+  KAFKA_BROKERS: "redpanda.data-layer.svc.cluster.local:9092"
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ingest
+  namespace: apps
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: ingest
+  template:
+    metadata:
+      labels:
+        app: ingest
+    spec:
+      containers:
+        - name: ingest
+          image: debian:bullseye-slim # потом поправить как нить
+          command: ["sleep", "infinity"]
+          ports:
+            - containerPort: 1935
+          envFrom:
+            - configMapRef:
+                name: ingest-config
+          resources:
+            requests:
+              memory: "64Mi"
+              cpu: "100m"
+            limits:
+              memory: "128Mi"
+              cpu: "500m"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: ingest-service
+  namespace: apps
+spec:
+  type: LoadBalancer
+  ports:
+    - port: 1935
+      targetPort: 1935
+      protocol: TCP
+  selector:
+    app: ingest

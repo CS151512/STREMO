@@ -1,0 +1,51 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: bff-config
+  namespace: apps
+data:
+  NODE_ENV: "production"
+  PORT: "3000"
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: bff
+  namespace: apps
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: bff
+  template:
+    metadata:
+      labels:
+        app: bff
+    spec:
+      containers:
+        - name: bff
+          image: nginx:alpine
+          ports:
+            - containerPort: 3000
+          envFrom:
+            - configMapRef:
+                name: bff-config
+          resources:
+            requests:
+              memory: "64Mi"
+              cpu: "100m"
+            limits:
+              memory: "128Mi"
+              cpu: "250m"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: bff-service
+  namespace: apps
+spec:
+  ports:
+    - port: 3000
+      targetPort: 3000
+  selector:
+    app: bff

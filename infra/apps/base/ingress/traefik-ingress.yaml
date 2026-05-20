@@ -1,0 +1,39 @@
+apiVersion: traefik.containo.us/v1alpha1
+kind: IngressRoute
+metadata:
+  name: api-ingress
+  namespace: apps
+spec:
+  entryPoints:
+    - web
+  routes:
+    - match: PathPrefix(`/v1`) || PathPrefix(`/api`)
+      kind: Rule
+      services:
+        - name: bff-service
+          port: 3000
+    - match: PathPrefix(`/ws`)
+      kind: Rule
+      services:
+        - name: chat-service
+          port: 8080
+---
+apiVersion: traefik.containo.us/v1alpha1
+kind: IngressRoute
+metadata:
+  name: monitoring-ingress
+  namespace: monitoring
+spec:
+  entryPoints:
+    - web
+  routes:
+    - match: Host(`grafana.localhost`)
+      kind: Rule
+      services:
+        - name: grafana
+          port: 80
+    - match: Host(`prometheus.localhost`)
+      kind: Rule
+      services:
+        - name: prometheus
+          port: 9090
