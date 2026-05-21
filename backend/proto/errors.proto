@@ -1,0 +1,15 @@
+syntax = "proto3";
+
+package stremo.errors.v1;
+
+message AppError {
+  string code = 1;
+  string message = 2;
+  repeated ErrorDetail details = 3;
+  string request_id = 4;
+}
+
+message ErrorDetail {
+  string field = 1;
+  string issue = 2;
+}
