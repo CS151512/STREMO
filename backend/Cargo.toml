@@ -1,0 +1,19 @@
+[workspace]
+resolver = "2"
+
+members = [
+    "service/chat-service",
+    "service/ingest-service",
+    "service/transcoder-service",
+    "service/analytics-service",
+    "service/billing-service",
+    "service/moderation-service",
+    "service/bff_service"
+]
+
+[profile.release]
+opt-level = "z"
+lto = true
+codegen-units = 1
+panic = "abort"
+strip = true
