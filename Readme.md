@@ -2,7 +2,7 @@
 
 <div align="center">
 
-![GitHub stars](https://shields.io)
+[![GitHub stars](https://img.shields.io/github/stars/CS151512/STREMO?style=social)](https://github.com/CS151512/STREMO)
 [![Licence](https://img.shields.io/github/license/Ileriayo/markdown-badges?style=for-the-badge)](./LICENSE)
 
 <br>
