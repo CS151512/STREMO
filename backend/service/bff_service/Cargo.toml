@@ -1,0 +1,7 @@
+[package]
+name = "bff-service"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+rust-core = { path = "../../libs/rust-core" }
