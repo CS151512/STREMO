@@ -1,6 +1,8 @@
+use super::pb::stream_meta::{
+    stream_meta_service_client::StreamMetaServiceClient, GetLiveStreamsRequest,
+    GetLiveStreamsResponse,
+};
 use crate::utils::errors::AppError;
-use super::pb::stream_meta::{stream_meta_service_client::StreamMetaServiceClient,
-    GetLiveStreamsRequest, GetLiveStreamsResponse};
 use tonic::transport::Channel;
 
 #[derive(Clone)]
@@ -14,8 +16,11 @@ impl StreamMetaGrpcClient {
         Ok(Self { client })
     }
 
-    pub async fn get_live_streams(&mut self, limit: i32,
-        cursor: String) -> Result<GetLiveStreamsResponse, AppError> {
+    pub async fn get_live_streams(
+        &mut self,
+        limit: i32,
+        cursor: String,
+    ) -> Result<GetLiveStreamsResponse, AppError> {
         let request = tonic::Request::new(GetLiveStreamsRequest { limit, cursor });
         let response = self.client.get_live_streams(request).await?;
         Ok(response.into_inner())
