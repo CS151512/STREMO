@@ -5,3 +5,23 @@ edition = "2021"
 
 [dependencies]
 rust-core = { path = "../../libs/rust-core" }
+axum = "0.7"
+tokio = { version = "1.37", features = ["full"] }
+tower = "0.4"
+tower-http = { version = "0.5", features = ["trace", "cors"] }
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+thiserror = "1.0"
+jsonwebtoken = "9.3"
+tonic = "0.11"
+prost = "0.12"
+redis = { version = "0.25", features = ["tokio-comp"] }
+bb8 = "0.8"
+bb8-redis = "0.15"
+dotenvy = "0.15"
+tracing = "0.1"
+tracing-subscriber = { version = "0.3", features = ["env-filter"] }
+uuid = { version = "1.8", features = ["v4", "serde"] }
+anyhow = "1.0.102"
+[build-dependencies]
+tonic-build = "0.11"
