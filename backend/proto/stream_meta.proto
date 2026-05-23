@@ -1,0 +1,24 @@
+syntax = "proto3";
+
+package stremo.stream_meta.v1;
+
+service StreamMetaService {
+  rpc GetLiveStreams(GetLiveStreamsRequest) returns (GetLiveStreamsResponse);
+}
+
+message GetLiveStreamsRequest {
+  int32 limit = 1;
+  string cursor = 2;
+}
+
+message StreamDto {
+  string stream_id = 1;
+  string title = 2;
+  string category = 3;
+  int32 viewers_count = 4;
+}
+
+message GetLiveStreamsResponse {
+  repeated StreamDto streams = 1;
+  string next_cursor = 2;
+}
