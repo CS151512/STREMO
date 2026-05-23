@@ -1,39 +1,38 @@
-use axum::{extract::{
-    State, Query
-}, Json};
+use axum::{
+    extract::{Query, State},
+    Json,
+};
 use std::sync::Arc;
-
 
 use crate::{
     models::{
-        requests ::GetStreamsQeury,
-        responses::{StreamCatalogItem, StreamCatalogResponse}
-    }
+        requests::GetStreamsQuery,
+        responses::{StreamCatalogItem, StreamCatalogResponse},
+    },
     utils::errors::AppError,
-    AppState,
+    utils::state::AppState,
 };
-
 
 pub async fn get_live_streams_handler(
     State(state): State<Arc<AppState>>,
-    Query(query): Query<GetStreamQuery>,
+    Query(query): Query<GetStreamsQuery>,
 ) -> Result<Json<StreamCatalogResponse>, AppError> {
-    let limit  = query.limit.unwrap_or(20);
+    let limit = query.limit.unwrap_or(20);
     let cursor = query.cursor.unwrap_or_default();
 
-    let mut stream_client =
-        state.stream_meta_grpc_client.clone();
+    let mut stream_client = state.stream_meta_grpc_client.clone();
+    let grpc_res = stream_client.get_live_streams(limit, cursor).await?;
 
-    let grpc_res =
-        stream_client.get_live_streams(limit,
-            cursor).await?;
-
-    let streams = grpc_res.streams.into_iter().map(|s| StreamCatalogItem {
-        stream_id: s.stream_id,
-        title: s.title,
-        category: s.category,
-        viewers_count: s.viewers_count,
-    }).collect();
+    let streams = grpc_res
+        .streams
+        .into_iter()
+        .map(|s| StreamCatalogItem {
+            stream_id: s.stream_id,
+            title: s.title,
+            category: s.category,
+            viewers_count: s.viewers_count,
+        })
+        .collect();
 
     Ok(Json(StreamCatalogResponse {
         data: streams,

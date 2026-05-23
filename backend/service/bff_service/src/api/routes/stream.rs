@@ -1,4 +1,4 @@
-use crate::{api::handlers::stream, AppState};
+use crate::{api::handlers::stream, utils::state::AppState};
 use axum::{routing::get, Router};
 use std::sync::Arc;
 
