@@ -4,7 +4,7 @@ use serde::Serialize;
 pub struct LoginResponse {
     pub access_token: String,
     pub refresh_token: String,
-    pub exprise_in: u32,
+    pub expires_in: u32,
 }
 
 #[derive(Serialize)]
