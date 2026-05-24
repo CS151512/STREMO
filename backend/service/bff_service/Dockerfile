@@ -1,5 +1,5 @@
-FROM rust:1.85-slim-bookworm AS builder
-RUN apt-get update && apt-get install -y pkg-config libssl-dev cmake build-essential
+FROM rust:slim-bookworm AS builder
+RUN apt-get update && apt-get install -y pkg-config libssl-dev cmake build-essential protobuf-compiler
 WORKDIR /app
 
 COPY . .
