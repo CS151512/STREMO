@@ -119,6 +119,7 @@ jobs:
           context: backend
           file: backend/service/bff_service/Dockerfile
           push: false
+          load: true
           tags: stremo/bff-service:dev-test
           cache-from: type=gha
           cache-to: type=gha,mode=max
