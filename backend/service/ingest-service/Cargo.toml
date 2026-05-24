@@ -1,0 +1,25 @@
+[package]
+name = "ingest-service"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+rust-core = {path = "../../libs/rust-core"}
+
+tokio = {version = "1.37", features = ["full"]}
+tokio-util = {version = "0.7", features = ["codec"]}
+
+tonic = "0.11"
+prost = "0.12"
+
+anyhow = "1.0"
+thiserror = "1.0"
+
+tracing = "0.1"
+tracing-subscriber = {version = "0.3", features = ["env-filter"]}
+
+dotenvy = "0.15"
+bytes = "1.5"
+
+[build-dependencies]
+tomic-build = "0.11"
