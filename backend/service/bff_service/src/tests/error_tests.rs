@@ -1,6 +1,6 @@
 use crate::utils::errors::AppError;
-use axum::response::IntoResponse;
 use axum::http::StatusCode;
+use axum::response::IntoResponse;
 
 #[test]
 fn test_invalid_credentials_mapping() {
@@ -34,7 +34,7 @@ fn test_internal_error_mapping() {
 fn test_tonic_status_conversion() {
     let status = tonic::Status::new(tonic::Code::Unavailable, "Server is down");
     let app_error: AppError = status.into();
-    
+
     match app_error {
         AppError::GrpcError(msg) => assert_eq!(msg, "Server is down"),
         _ => panic!("Expected GrpcError"),

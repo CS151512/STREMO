@@ -1,17 +1,26 @@
 use crate::middleware::jwt_auth::Claims;
-use jsonwebtoken::{encode, decode, EncodingKey, DecodingKey, Header, Validation};
+use jsonwebtoken::{decode, encode, DecodingKey, EncodingKey, Header, Validation};
 
 #[test]
 fn test_valid_jwt_decoding() {
     let secret = "super_secret_test_key".as_bytes();
-    
+
     let claims = Claims {
         sub: "usr-123".to_string(),
         username: "tester".to_string(),
-        exp: (std::time::SystemTime::now().duration_since(std::time::UNIX_EPOCH).unwrap().as_secs() + 3600) as usize,
+        exp: (std::time::SystemTime::now()
+            .duration_since(std::time::UNIX_EPOCH)
+            .unwrap()
+            .as_secs()
+            + 3600) as usize,
     };
 
-    let token = encode(&Header::default(), &claims, &EncodingKey::from_secret(secret)).unwrap();
+    let token = encode(
+        &Header::default(),
+        &claims,
+        &EncodingKey::from_secret(secret),
+    )
+    .unwrap();
 
     let token_data = decode::<Claims>(
         &token,
@@ -28,14 +37,23 @@ fn test_valid_jwt_decoding() {
 #[test]
 fn test_expired_jwt_decoding() {
     let secret = "super_secret_test_key".as_bytes();
-    
+
     let claims = Claims {
         sub: "usr-123".to_string(),
         username: "tester".to_string(),
-        exp: (std::time::SystemTime::now().duration_since(std::time::UNIX_EPOCH).unwrap().as_secs() - 3600) as usize,
+        exp: (std::time::SystemTime::now()
+            .duration_since(std::time::UNIX_EPOCH)
+            .unwrap()
+            .as_secs()
+            - 3600) as usize,
     };
 
-    let token = encode(&Header::default(), &claims, &EncodingKey::from_secret(secret)).unwrap();
+    let token = encode(
+        &Header::default(),
+        &claims,
+        &EncodingKey::from_secret(secret),
+    )
+    .unwrap();
 
     let token_data = decode::<Claims>(
         &token,

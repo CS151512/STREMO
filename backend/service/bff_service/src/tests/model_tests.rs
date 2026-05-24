@@ -1,4 +1,4 @@
-use crate::models::requests::{LoginRequest, GetStreamsQuery};
+use crate::models::requests::{GetStreamsQuery, LoginRequest};
 use crate::models::responses::{LoginResponse, StreamCatalogItem, StreamCatalogResponse};
 
 #[test]
