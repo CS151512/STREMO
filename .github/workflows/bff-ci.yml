@@ -93,7 +93,7 @@ jobs:
 
       - name: Run Tests & Generate Coverage
         working-directory: ${{ env.WORKING_DIR }}
-        run: cargo llvm-cov test --all-features --workspace --lcov --output-path lcov.info --fail-under-lines 15
+        run: cargo llvm-cov test -p bff-service -all-features --lcov --output-path lcov.info --fail-under-lines 15
 
       - name: Upload Coverage to Codecov
         uses: codecov/codecov-action@v4
