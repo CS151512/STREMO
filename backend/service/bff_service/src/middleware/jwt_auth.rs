@@ -4,9 +4,10 @@ use redis::AsyncCommands;
 use serde::{Deserialize, Serialize};
 use std::sync::Arc;
 
-use crate::{utils::errors::AppError, utils::state::AppState};
+use crate::{utils::errors::AppError, AppState};
 
 #[derive(Debug, Serialize, Deserialize)]
+#[allow(dead_code)]
 pub struct Claims {
     pub sub: String,
     pub username: String,
@@ -25,10 +26,10 @@ impl FromRequestParts<Arc<AppState>> for Claims {
             .headers
             .get("Authorization")
             .and_then(|h| h.to_str().ok())
-            .ok_or_else(|| AppError::Unauthorized("Token is missing".to_string()))?;
+            .ok_or_else(|| AppError::Unauthorized("Отсутствует токен".to_string()))?;
 
         if !auth_header.starts_with("Bearer ") {
-            return Err(AppError::Unauthorized("Invalid token format".to_string()));
+            return Err(AppError::Unauthorized("Неверный формат токена".to_string()));
         }
 
         let token = &auth_header[7..];
@@ -38,7 +39,7 @@ impl FromRequestParts<Arc<AppState>> for Claims {
             &DecodingKey::from_secret(state.config.jwt_secret.as_bytes()),
             &Validation::default(),
         )
-        .map_err(|_| AppError::Unauthorized("Invalid token".to_string()))?;
+        .map_err(|_| AppError::Unauthorized("Недействительный токен".to_string()))?;
 
         let mut redis_conn = state.redis_pool.get().await.map_err(|e| {
             tracing::error!("Redis pool error: {}", e);
@@ -53,11 +54,11 @@ impl FromRequestParts<Arc<AppState>> for Claims {
 
         if is_blacklisted {
             tracing::warn!(
-                "Access attempt with revoked token: {}",
+                "Попытка доступа с отозванным токеном: {}",
                 token_data.claims.sub
             );
             return Err(AppError::Unauthorized(
-                "Session revoked. Re-login required.".to_string(),
+                "Сессия отозвана. Требуется повторный вход.".to_string(),
             ));
         }
 

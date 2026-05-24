@@ -1,13 +1,8 @@
+use crate::{utils::errors::AppError, AppState};
 use axum::{
     extract::{Request, State},
     middleware::Next,
     response::Response,
-};
-use tracing_subscriber::fmt::format;
-
-use crate::{
-    models::requests,
-    utils::{errors::AppError, state::AppState},
 };
 use std::sync::Arc;
 use std::time::{SystemTime, UNIX_EPOCH};
@@ -32,12 +27,11 @@ pub async fn rate_limit_middleware(
         })
         .unwrap_or_else(|| "unknown_ip".to_string());
 
-    let redis_key = format!("rate_limit:ip: {}", ip);
+    let redis_key = format!("rate_limit:ip:{}", ip);
     let now = SystemTime::now()
         .duration_since(UNIX_EPOCH)
         .unwrap()
         .as_millis() as u64;
-
     let window_start = now - 60_000;
     let request_id = Uuid::new_v4().to_string();
 

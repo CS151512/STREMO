@@ -95,3 +95,6 @@ async fn shutdown_signal() {
     }
     tracing::info!("Received shutdown signal, starting graceful shutdown...");
 }
+
+#[cfg(test)]
+mod tests;
