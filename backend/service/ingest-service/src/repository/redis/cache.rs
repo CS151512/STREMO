@@ -26,7 +26,7 @@ impl RedisCache {
         let key = format!("rate_limit:{}", ip);
 
         let count: redis::RedisResult<u32> =
-            redis::cmd("INCR").arg(&key).query_async(&mut conn).await?;
+            redis::cmd("INCR").arg(&key).query_async(&mut conn).await;
         let count = count?;
 
         if count == 1 {
