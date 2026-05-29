@@ -31,7 +31,7 @@ async fn main() -> anyhow::Result<()> {
         "Connecting to Auth Service at {}",
         config.auth_service_grpc_url
     );
-    let auth_client = AuthGrpcClient::connect(&config.auth_service_grpc_url.clone()).await?;
+    let auth_client = AuthGrpcClient::connect(config.auth_service_grpc_url.clone()).await?;
 
     let ffmpeg_runner = Arc::new(FFmpegRunner::new(
         config.ffmpeg_path.clone(),
