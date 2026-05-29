@@ -8,7 +8,7 @@ pub struct PostgresRepo {
 }
 
 impl PostgresRepo {
-    pub async fn new(dns: &str) -> nayhow::Result<Self> {
+    pub async fn new(dns: &str) -> anyhow::Result<Self> {
         let mut cfg = Config::new();
         cfg.url = Some(dns.to_string());
         cfg.manager = Some(deadpool_postgres::ManagerConfig {
