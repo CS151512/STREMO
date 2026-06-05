@@ -1,19 +1,15 @@
 use serde::{Deserialize, Serialize};
-use uuid::Uuid;
 
-#[derive(Debug, Clone, Deserialize, Serialize)]
-pub enum AnalyticsEvent {
-    StreamStarted {
-        stream_id: Uuid,
-        timestamp: i64,
-    },
-    StreamEnded {
-        stream_id: Uuid,
-        timestamp: i64,
-    },
-    CcvMilestoneReached {
-        stream_id: Uuid,
-        ccv: u64,
-        timestamp: i64,
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(tag = "type", content = "payload")]
+pub enum WsEvent {
+    #[serde(rename = "ccv_update")]
+    CcvUpdate { stream_id: String, current_ccv: i32 },
+    #[serde(rename = "summary_update")]
+    SummaryUpdate {
+        stream_id: String,
+        current_ccv: i32,
+        peak_ccv: u32,
+        total_unique_views: u64,
     },
 }
