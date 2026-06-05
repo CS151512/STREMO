@@ -37,6 +37,8 @@ metrics = "0.22"
 metrics-exporter-prometheus = "0.13"
 
 dotenvy = "0.15"
+sqlx = { version = "0.8", features = ["runtime-tokio-rustls", "postgres", "uuid"] }
+validator = { version = "0.16", features = ["derive"] }
 config = "0.14"
 
 
