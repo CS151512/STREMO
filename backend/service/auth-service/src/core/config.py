@@ -47,7 +47,7 @@ class Settings(BaseSettings):
         return f"redis://{self.redis_host}:{self.redis_port}/{self.redis_db}"
 
     # Kafka
-    kafka_bootstrap_servers: str = "localhost:9092"
+    kafka_bootstrap_servers: str = "localhost:8000"
     kafka_topic_user_events: str = "user-events"
     kafka_consumer_group: str = "auth-service"
 
