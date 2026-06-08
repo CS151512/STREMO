@@ -1,56 +1,70 @@
-"""Custom exceptions for auth service."""
+from http import HTTPStatus
 
 
-class AuthError(Exception):
-    """Base exception for authentication errors."""
-    pass
+class AppException(Exception):
+    """Base application exception."""
+
+    status_code: int = HTTPStatus.INTERNAL_SERVER_ERROR
+    detail: str = "An unexpected error occurred."
+
+    def __init__(self, detail: str | None = None) -> None:
+        self.detail = detail or self.__class__.detail
+        super().__init__(self.detail)
 
 
-class InvalidCredentialsError(AuthError):
-    """Raised when credentials are invalid."""
-    pass
+# --- Auth ---
+
+class AuthException(AppException):
+    """Base auth exception."""
 
 
-class UserNotFoundError(AuthError):
-    """Raised when user is not found."""
-    pass
+class InvalidCredentialsError(AuthException):
+    status_code = HTTPStatus.UNAUTHORIZED
+    detail = "Invalid email or password."
 
 
-class UserAlreadyExistsError(AuthError):
-    """Raised when trying to create a user that already exists."""
-    pass
+class InvalidTokenError(AuthException):
+    status_code = HTTPStatus.UNAUTHORIZED
+    detail = "Token is invalid or has expired."
 
 
-class TokenExpiredError(AuthError):
-    """Raised when token has expired."""
-    pass
+class TokenExpiredError(AuthException):
+    status_code = HTTPStatus.UNAUTHORIZED
+    detail = "Token has expired."
 
 
-class InvalidTokenError(AuthError):
-    """Raised when token is invalid."""
-    pass
+class InsufficientPermissionsError(AuthException):
+    status_code = HTTPStatus.FORBIDDEN
+    detail = "You do not have permission to perform this action."
 
 
-class TokenNotFoundError(AuthError):
-    """Raised when token is not found in storage."""
-    pass
+# --- User ---
+
+class UserException(AppException):
+    """Base user exception."""
 
 
-class PermissionDeniedError(AuthError):
-    """Raised when user lacks required permissions."""
-    pass
+class UserNotFoundError(UserException):
+    status_code = HTTPStatus.NOT_FOUND
+    detail = "User not found."
 
 
-class RateLimitExceededError(AuthError):
-    """Raised when rate limit is exceeded."""
-    pass
+class UserAlreadyExistsError(UserException):
+    status_code = HTTPStatus.CONFLICT
+    detail = "A user with this email already exists."
 
 
-class DatabaseError(AuthError):
-    """Raised when database operation fails."""
-    pass
+class UserInactiveError(UserException):
+    status_code = HTTPStatus.FORBIDDEN
+    detail = "This user account is inactive."
 
 
-class CacheError(AuthError):
-    """Raised when cache operation fails."""
-    pass
+# --- Validation ---
+
+class ValidationException(AppException):
+    status_code = HTTPStatus.UNPROCESSABLE_ENTITY
+    detail = "Validation failed."
+
+
+class WeakPasswordError(ValidationException):
+    detail = "Password does not meet the minimum security requirements."

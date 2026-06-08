@@ -1,79 +1,61 @@
-"""Application configuration management."""
-
 from functools import lru_cache
-from typing import Optional
-
+from pydantic import PostgresDsn, RedisDsn, field_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
 class Settings(BaseSettings):
-    """Application settings loaded from environment variables."""
-
-    # Application
-    app_name: str = "Auth Service"
-    debug: bool = False
-    environment: str = "production"  # development, staging, production
-
-    # Server
-    http_host: str = "0.0.0.0"
-    http_port: int = 8000
-    grpc_host: str = "0.0.0.0"
-    grpc_port: int = 50051
-
-    # Database
-    postgres_host: str = "localhost"
-    postgres_port: int = 5432
-    postgres_user: str = "postgres"
-    postgres_password: str = "postgres"
-    postgres_db: str = "auth_db"
-    postgres_pool_size: int = 10
-
-    @property
-    def postgres_dsn(self) -> str:
-        """Get PostgreSQL connection string."""
-        return f"postgresql://{self.postgres_user}:{self.postgres_password}@{self.postgres_host}:{self.postgres_port}/{self.postgres_db}"
-
-    # Redis
-    redis_host: str = "localhost"
-    redis_port: int = 6379
-    redis_password: Optional[str] = None
-    redis_db: int = 0
-
-    @property
-    def redis_dsn(self) -> str:
-        """Get Redis connection string."""
-        if self.redis_password:
-            return f"redis://:{self.redis_password}@{self.redis_host}:{self.redis_port}/{self.redis_db}"
-        return f"redis://{self.redis_host}:{self.redis_port}/{self.redis_db}"
-
-    # Kafka
-    kafka_bootstrap_servers: str = "localhost:8000"
-    kafka_topic_user_events: str = "user-events"
-    kafka_consumer_group: str = "auth-service"
-
-    # JWT
-    jwt_secret_key: str = "your-super-secret-key-change-in-production"
-    jwt_algorithm: str = "HS256"
-    jwt_access_token_expire_minutes: int = 30
-    jwt_refresh_token_expire_days: int = 7
-
-    # Security
-    bcrypt_rounds: int = 12
-
-    # CORS
-    allowed_origins: list[str] = ["*"]
-
     model_config = SettingsConfigDict(
         env_file=".env",
         env_file_encoding="utf-8",
         case_sensitive=False,
     )
 
+    # App
+    APP_NAME: str = "auth-service"
+    APP_ENV: str = "development"
+    DEBUG: bool = False
 
-@lru_cache()
+    # HTTP Server
+    HTTP_HOST: str = "0.0.0.0"
+    HTTP_PORT: int = 8000
+
+    # gRPC Server
+    GRPC_HOST: str = "0.0.0.0"
+    GRPC_PORT: int = 50051
+
+    # JWT
+    JWT_SECRET_KEY: str
+    JWT_ALGORITHM: str = "HS256"
+    JWT_ACCESS_TOKEN_EXPIRE_MINUTES: int = 30
+    JWT_REFRESH_TOKEN_EXPIRE_DAYS: int = 7
+
+    # PostgreSQL
+    POSTGRES_DSN: PostgresDsn
+
+    # Redis
+    REDIS_DSN: RedisDsn
+
+    # Kafka
+    KAFKA_BOOTSTRAP_SERVERS: str
+    KAFKA_TOPIC_USER_EVENTS: str = "user-events"
+    KAFKA_CONSUMER_GROUP_ID: str = "auth-service-group"
+
+    # Password hashing
+    BCRYPT_ROUNDS: int = 12
+
+    @field_validator("APP_ENV")
+    @classmethod
+    def validate_app_env(cls, v: str) -> str:
+        allowed = {"development", "staging", "production"}
+        if v not in allowed:
+            raise ValueError(f"APP_ENV must be one of {allowed}")
+        return v
+
+    @property
+    def is_production(self) -> bool:
+        return self.APP_ENV == "production"
+
+
+@lru_cache
 def get_settings() -> Settings:
-    """Get cached settings instance."""
     return Settings()
-
-
-settings = get_settings()
