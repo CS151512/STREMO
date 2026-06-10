@@ -1,15 +1,16 @@
 package routers
 
 import (
-	"stremo/vod-manager-service/internal/handlers"
-	"stremo/vod-manager-service/internal/middleware"
 	"time"
+
+	"stremo/stream-meta-service/internal/handlers"
+	"stremo/stream-meta-service/internal/middleware"
 
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 )
 
-func SetupRouter(vodHandler *handlers.VODHandler, jwtSecret string) *gin.Engine {
+func SetupRouter(metaHandler *handlers.MetaHandler, jwtSecret string) *gin.Engine {
 	r := gin.Default()
 
 	r.Use(cors.New(cors.Config{
@@ -23,12 +24,16 @@ func SetupRouter(vodHandler *handlers.VODHandler, jwtSecret string) *gin.Engine 
 
 	api := r.Group("/api/v1")
 	{
-		api.GET("/vods", vodHandler.GetVODs)
+		api.GET("/streams/live", metaHandler.GetLiveDirectory)
 		protected := api.Group("")
-		protected.Use(middleware.RequireAuth(jwtSecret))
+		protected.Use(middleware.RequireAuth(jwtSecret), middleware.RequireOwner())
 		{
-			protected.POST("/clips", vodHandler.CreateClip)
+			protected.PUT("/streams/meta/:channel_id", metaHandler.UpdateMeta)
 		}
+	}
+	internal := r.Group("/internal/v1")
+	{
+		internal.POST("/verify-key", metaHandler.VerifyKey)
 	}
 
 	return r
